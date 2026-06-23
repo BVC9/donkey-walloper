@@ -95,6 +95,31 @@ class VB_Renderer {
 		return '<div class="vb-visibility-' . esc_attr( $visibility ) . ' vb-anim-' . esc_attr( $animation ) . '">' . $html . '</div>';
 	}
 
+	protected static function render_video_embed( $url ) {
+		$embed = wp_oembed_get( $url );
+		if ( $embed ) {
+			return $embed;
+		}
+
+		if ( preg_match( '/\.(mp4|webm|ogg)(?:[?#].*)?$/i', $url, $matches ) ) {
+			$mime_types = array(
+				'mp4'  => 'video/mp4',
+				'webm' => 'video/webm',
+				'ogg'  => 'video/ogg',
+			);
+			$extension  = strtolower( $matches[1] );
+			$mime_type  = isset( $mime_types[ $extension ] ) ? $mime_types[ $extension ] : 'video/mp4';
+
+			return sprintf(
+				'<video class="vb-video-player" controls preload="metadata"><source src="%s" type="%s" /></video>',
+				esc_url( $url ),
+				esc_attr( $mime_type )
+			);
+		}
+
+		return '<a href="' . esc_url( $url ) . '">' . esc_html( $url ) . '</a>';
+	}
+
 	protected static function render_module( $module ) {
 		$type     = isset( $module['type'] ) ? $module['type'] : '';
 		$settings = isset( $module['settings'] ) ? $module['settings'] : array();
@@ -115,7 +140,7 @@ class VB_Renderer {
 				if ( ! empty( $settings['src'] ) ) $html = sprintf('<div class="vb-module vb-image"><img src="%s" alt="%s" style="width:%s%%;height:auto;" /></div>', esc_url( $settings['src'] ), esc_attr( $settings['alt'] ?? '' ), esc_attr( $settings['width'] ?? '100' ) );
 				break;
 			case 'video':
-				if ( ! empty( $settings['url'] ) ) $html = sprintf('<div class="vb-module vb-video"><div class="vb-video-embed">%s</div></div>', wp_oembed_get( $settings['url'] ) ?: esc_html( $settings['url'] ) );
+				if ( ! empty( $settings['url'] ) ) $html = sprintf('<div class="vb-module vb-video"><div class="vb-video-embed">%s</div></div>', self::render_video_embed( $settings['url'] ) );
 				break;
 			case 'spacer':
 				$html = sprintf('<div class="vb-module vb-spacer" style="height:%spx;"></div>', esc_attr( $settings['height'] ?? '40' ) );

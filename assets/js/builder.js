@@ -110,14 +110,14 @@
 			case 'button':
 				return '<div style="text-align:' + (s.align || 'left') + ';padding:8px;"><span style="display:inline-block;padding:10px 22px;border-radius:4px;background:' + (s.bg_color || 'var(--vb-primary)') + ';border-radius:var(--vb-button-radius);color:' + (s.text_color || '#fff') + ';font-size:13px;">' + escapeHtml(s.text || 'Click Here') + '</span></div>';
 			case 'image':
-				return s.src ? '<div style="padding:8px;"><img src="' + s.src + '" style="width:' + (s.width || 100) + '%;display:block;" /></div>' : emptyModulePlaceholder('Image — click to set source');
+				return s.src ? '<div style="padding:8px;"><img src="' + escapeAttr(s.src) + '" style="width:' + (s.width || 100) + '%;display:block;" /></div>' : emptyModulePlaceholder('Image — click to set source');
 			case 'video':
 				return s.url ? '<div style="padding:8px;color:#666;font-size:12px;">Video: ' + escapeHtml(s.url) + '</div>' : emptyModulePlaceholder('Video — click to add URL');
 			case 'spacer':
 				return '<div style="height:' + (s.height || 40) + 'px;background:repeating-linear-gradient(45deg,#f4f4f5,#f4f4f5 10px,#fafafa 10px,#fafafa 20px);"></div>';
 			case 'gallery':
 				var imgs = (s.images || []).slice(0, 6).map(function (src) {
-					return '<img src="' + src + '" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />';
+					return '<img src="' + escapeAttr(src) + '" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />';
 				}).join('');
 				return '<div style="padding:8px;display:flex;gap:6px;flex-wrap:wrap;">' + (imgs || emptyModulePlaceholder('Gallery — click to add images')) + '</div>';
 			case 'form':
@@ -134,7 +134,7 @@
 			case 'pricing':
 				return '<div style="border:1px solid #e4e4e7;border-radius:12px;padding:20px;text-align:center;"><h3>' + escapeHtml(s.plan_name || 'Starter') + '</h3><div style="font-size:34px;font-weight:800;">' + escapeHtml(s.price || '£49') + '<small>' + escapeHtml(s.period || '/month') + '</small></div><p style="white-space:pre-line;">' + escapeHtml(s.features || '') + '</p><span style="display:inline-block;background:' + (s.accent_color || 'var(--vb-primary)') + ';color:#fff;padding:10px 18px;border-radius:var(--vb-button-radius);">' + escapeHtml(s.button_text || 'Choose Plan') + '</span></div>';
 			case 'testimonial':
-				return '<div style="border:1px solid #e4e4e7;border-radius:12px;padding:18px;display:flex;gap:14px;align-items:center;">' + (s.image ? '<img src="' + s.image + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;" />' : '') + '<div><div>★★★★★</div><blockquote style="margin:6px 0;">' + escapeHtml(s.quote || '') + '</blockquote><strong>' + escapeHtml(s.name || '') + '</strong><br><small>' + escapeHtml(s.role || '') + '</small></div></div>';
+				return '<div style="border:1px solid #e4e4e7;border-radius:12px;padding:18px;display:flex;gap:14px;align-items:center;">' + (s.image ? '<img src="' + escapeAttr(s.image) + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;" />' : '') + '<div><div>★★★★★</div><blockquote style="margin:6px 0;">' + escapeHtml(s.quote || '') + '</blockquote><strong>' + escapeHtml(s.name || '') + '</strong><br><small>' + escapeHtml(s.role || '') + '</small></div></div>';
 			case 'faq_schema':
 				return '<div style="padding:8px;"><strong>FAQ Schema</strong><details open><summary>' + escapeHtml(s.item_1_title || 'Question one') + '</summary><div>' + escapeHtml(s.item_1_content || '') + '</div></details><details><summary>' + escapeHtml(s.item_2_title || 'Question two') + '</summary></details><details><summary>' + escapeHtml(s.item_3_title || 'Question three') + '</summary></details></div>';
 			case 'popup':
@@ -328,7 +328,7 @@
 				break;
 			case 'image':
 				$wrap.append(
-					'<div class="vb-field-image-preview">' + (value ? '<img src="' + value + '" />' : '<span style="color:#666;font-size:12px;">No image selected</span>') + '</div>' +
+					'<div class="vb-field-image-preview">' + (value ? '<img src="' + escapeAttr(value) + '" />' : '<span style="color:#666;font-size:12px;">No image selected</span>') + '</div>' +
 					'<button type="button" class="vb-field-btn vb-select-image">Select Image</button>'
 				);
 				break;
@@ -342,7 +342,7 @@
 	}
 
 	function escapeAttr(str) {
-		return (str + '').replace(/"/g, '&quot;');
+		return (str + '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	}
 
 	function bindFieldEvents(mod) {
@@ -597,7 +597,7 @@
 
 		$('#vb-blocks-btn').on('click', function () { buildBlocksGrid(); $('#vb-blocks-modal').addClass('open'); });
 		$('#vb-blocks-modal-close').on('click', function () { $('#vb-blocks-modal').removeClass('open'); });
-		$(document).on('click', '.vb-block-insert', function () { insertBlock($(this).data('block-id')); $('#vb-blocks-modal').removeClass('open'); });
+		$(document).on('click', '.vb-block-insert', function (e) { e.preventDefault(); e.stopImmediatePropagation(); insertBlock($(this).data('block-id')); $('#vb-blocks-modal').removeClass('open'); });
 		$(document).on('click', '.vb-block-delete', function (e) { e.stopPropagation(); deleteBlock($(this).data('block-id')); });
 		$('#vb-export-btn').on('click', exportLayout);
 		$('#vb-import-btn').on('click', openImport);
@@ -607,7 +607,7 @@
 
 		$('#vb-template-btn').on('click', function () { $('#vb-template-modal').addClass('open'); });
 		$('#vb-template-modal-close').on('click', function () { $('#vb-template-modal').removeClass('open'); });
-		$(document).on('click', '.vb-template-option', function () { insertTemplate($(this).data('template')); $('#vb-template-modal').removeClass('open'); });
+		$(document).on('click', '.vb-template-option:not(.vb-block-insert)', function () { insertTemplate($(this).data('template')); $('#vb-template-modal').removeClass('open'); });
 
 		$('#vb-add-row, #vb-add-row-empty').on('click', function () {
 			$('#vb-row-modal').addClass('open');

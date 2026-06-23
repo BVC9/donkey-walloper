@@ -28,6 +28,7 @@
 .vb-button:hover { opacity: .85; }
 .vb-image img { max-width: 100%; display: block; }
 .vb-video-embed iframe { width: 100%; aspect-ratio: 16/9; }
+.vb-video-player { width: 100%; max-width: 100%; display: block; }
 .vb-spacer { width: 100%; }
 
 .vb-gallery { display: flex; flex-wrap: wrap; gap: 10px; }
