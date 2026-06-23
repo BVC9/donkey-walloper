@@ -95,6 +95,31 @@ class VB_Renderer {
 		return '<div class="vb-visibility-' . esc_attr( $visibility ) . ' vb-anim-' . esc_attr( $animation ) . '">' . $html . '</div>';
 	}
 
+	protected static function render_video_embed( $url ) {
+		$embed = wp_oembed_get( $url );
+		if ( $embed ) {
+			return $embed;
+		}
+
+		if ( preg_match( '/\.(mp4|webm|ogg)(?:[?#].*)?$/i', $url, $matches ) ) {
+			$mime_types = array(
+				'mp4'  => 'video/mp4',
+				'webm' => 'video/webm',
+				'ogg'  => 'video/ogg',
+			);
+			$extension  = strtolower( $matches[1] );
+			$mime_type  = isset( $mime_types[ $extension ] ) ? $mime_types[ $extension ] : 'video/mp4';
+
+			return sprintf(
+				'<video class="vb-video-player" controls preload="metadata"><source src="%s" type="%s" /></video>',
+				esc_url( $url ),
+				esc_attr( $mime_type )
+			);
+		}
+
+		return '<a href="' . esc_url( $url ) . '">' . esc_html( $url ) . '</a>';
+	}
+
 	protected static function render_module( $module ) {
 		$type     = isset( $module['type'] ) ? $module['type'] : '';
 		$settings = isset( $module['settings'] ) ? $module['settings'] : array();
@@ -115,7 +140,7 @@ class VB_Renderer {
 				if ( ! empty( $settings['src'] ) ) $html = sprintf('<div class="vb-module vb-image"><img src="%s" alt="%s" style="width:%s%%;height:auto;" /></div>', esc_url( $settings['src'] ), esc_attr( $settings['alt'] ?? '' ), esc_attr( $settings['width'] ?? '100' ) );
 				break;
 			case 'video':
-				if ( ! empty( $settings['url'] ) ) $html = sprintf('<div class="vb-module vb-video"><div class="vb-video-embed">%s</div></div>', wp_oembed_get( $settings['url'] ) ?: esc_html( $settings['url'] ) );
+				if ( ! empty( $settings['url'] ) ) $html = sprintf('<div class="vb-module vb-video"><div class="vb-video-embed">%s</div></div>', self::render_video_embed( $settings['url'] ) );
 				break;
 			case 'spacer':
 				$html = sprintf('<div class="vb-module vb-spacer" style="height:%spx;"></div>', esc_attr( $settings['height'] ?? '40' ) );
@@ -130,10 +155,25 @@ class VB_Renderer {
 				$html .= '<input type="text" name="website" value="" class="vb-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />';
 				$html .= '<h3>' . esc_html( $settings['title'] ?? 'Get in touch' ) . '</h3><input name="name" type="text" placeholder="Name" aria-label="Name" required /><input name="email" type="email" placeholder="Email" aria-label="Email" required />';
 				if ( $show_phone ) { $html .= '<input name="phone" type="tel" placeholder="Phone" aria-label="Phone" />'; }
-				$html .= '<textarea name="message" placeholder="Message" aria-label="Message"></textarea><button type="submit">' . esc_html( $settings['button_text'] ?? 'Send Message' ) . '</button><div class="vb-form-status" role="status"></div></form>';
+				$html .= '<textarea name="message" placeholder="Message" aria-label="Message"></textarea><button type="submit">' . esc_html( $settings['button_text'] ?? 'Send Message' ) . '</button><div class="vb-form-status" role="status" aria-live="polite" aria-atomic="true"></div></form>';
 				break;
 			case 'tabs':
-				$html = '<div class="vb-module vb-tabs"><div class="vb-tabs-nav">'; for ( $i = 1; $i <= 3; $i++ ) { $html .= '<button type="button" class="' . ( 1 === $i ? 'active' : '' ) . '" data-vb-tab="' . esc_attr( $i ) . '">' . esc_html( $settings[ 'tab_' . $i . '_title' ] ?? ( 'Tab ' . $i ) ) . '</button>'; } $html .= '</div>'; for ( $i = 1; $i <= 3; $i++ ) { $html .= '<div class="vb-tab-panel ' . ( 1 === $i ? 'active' : '' ) . '" data-vb-panel="' . esc_attr( $i ) . '">' . wp_kses_post( $settings[ 'tab_' . $i . '_content' ] ?? '' ) . '</div>'; } $html .= '</div>';
+				$tabs_id = 'vb-tabs-' . wp_rand( 10000, 99999 );
+				$html    = '<div class="vb-module vb-tabs" data-vb-tabs="' . esc_attr( $tabs_id ) . '"><div class="vb-tabs-nav" role="tablist">';
+				for ( $i = 1; $i <= 3; $i++ ) {
+					$is_active = 1 === $i;
+					$tab_id    = $tabs_id . '-tab-' . $i;
+					$panel_id  = $tabs_id . '-panel-' . $i;
+					$html     .= '<button type="button" id="' . esc_attr( $tab_id ) . '" class="' . ( $is_active ? 'active' : '' ) . '" data-vb-tab="' . esc_attr( $i ) . '" role="tab" aria-selected="' . ( $is_active ? 'true' : 'false' ) . '" aria-controls="' . esc_attr( $panel_id ) . '" tabindex="' . ( $is_active ? '0' : '-1' ) . '">' . esc_html( $settings[ 'tab_' . $i . '_title' ] ?? ( 'Tab ' . $i ) ) . '</button>';
+				}
+				$html .= '</div>';
+				for ( $i = 1; $i <= 3; $i++ ) {
+					$is_active = 1 === $i;
+					$tab_id    = $tabs_id . '-tab-' . $i;
+					$panel_id  = $tabs_id . '-panel-' . $i;
+					$html     .= '<div id="' . esc_attr( $panel_id ) . '" class="vb-tab-panel ' . ( $is_active ? 'active' : '' ) . '" data-vb-panel="' . esc_attr( $i ) . '" role="tabpanel" aria-labelledby="' . esc_attr( $tab_id ) . '"' . ( $is_active ? '' : ' hidden' ) . '>' . wp_kses_post( $settings[ 'tab_' . $i . '_content' ] ?? '' ) . '</div>';
+				}
+				$html .= '</div>';
 				break;
 			case 'accordion':
 			case 'faq_schema':
@@ -143,8 +183,8 @@ class VB_Renderer {
 				$html .= '</div>'; if ( 'faq_schema' === $type ) { $html .= '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>'; }
 				break;
 			case 'slider':
-				$images = isset( $settings['images'] ) && is_array( $settings['images'] ) ? $settings['images'] : array(); $style = self::responsive_var_style( $settings, 'height', 'vb-slider-height' ); $html = '<div class="vb-module vb-slider" style="' . $style . '">';
-				if ( empty( $images ) ) { $html .= '<div class="vb-slide active"><span>No slider images selected.</span></div>'; } else { foreach ( $images as $index => $img ) { $html .= '<div class="vb-slide ' . ( 0 === $index ? 'active' : '' ) . '" style="background-image:url(' . esc_url( $img ) . ');"></div>'; } }
+				$images = isset( $settings['images'] ) && is_array( $settings['images'] ) ? $settings['images'] : array(); $style = self::responsive_var_style( $settings, 'height', 'vb-slider-height' ); $html = '<div class="vb-module vb-slider" style="' . $style . '" aria-roledescription="carousel">';
+				if ( empty( $images ) ) { $html .= '<div class="vb-slide active" aria-hidden="false"><span>No slider images selected.</span></div>'; } else { foreach ( $images as $index => $img ) { $html .= '<div class="vb-slide ' . ( 0 === $index ? 'active' : '' ) . '" aria-hidden="' . ( 0 === $index ? 'false' : 'true' ) . '" style="background-image:url(' . esc_url( $img ) . ');"></div>'; } }
 				if ( ! empty( $settings['caption'] ) ) { $html .= '<div class="vb-slider-caption">' . esc_html( $settings['caption'] ) . '</div>'; } $html .= '</div>';
 				break;
 			case 'countdown':
@@ -164,9 +204,10 @@ class VB_Renderer {
 				$trigger = in_array( $settings['trigger'] ?? 'timed', array( 'button', 'timed', 'exit_intent' ), true ) ? $settings['trigger'] : 'timed';
 				$delay = max( 0, intval( $settings['delay'] ?? 5 ) );
 				$popup_id = 'vb-popup-' . wp_rand( 10000, 99999 );
+				$title_id = $popup_id . '-title';
 				$html  = '<div class="vb-module vb-popup-module" data-vb-popup-trigger="' . esc_attr( $trigger ) . '" data-vb-popup-delay="' . esc_attr( $delay ) . '" data-vb-popup-id="' . esc_attr( $popup_id ) . '">';
-				if ( 'button' === $trigger ) { $html .= '<button type="button" class="vb-button vb-popup-open">' . esc_html( $settings['button_label'] ?? 'Open Offer' ) . '</button>'; }
-				$html .= '<div class="vb-popup-overlay" id="' . esc_attr( $popup_id ) . '" aria-hidden="true"><div class="vb-popup-box" style="background:' . esc_attr( $settings['bg_color'] ?? '#fff' ) . ';"><button type="button" class="vb-popup-close" aria-label="Close popup">×</button><h3>' . esc_html( $settings['title'] ?? 'Special Offer' ) . '</h3><div>' . wp_kses_post( $settings['content'] ?? '' ) . '</div><a class="vb-button" href="' . esc_url( $settings['cta_url'] ?? '#' ) . '">' . esc_html( $settings['cta_text'] ?? 'Learn More' ) . '</a></div></div></div>';
+				if ( 'button' === $trigger ) { $html .= '<button type="button" class="vb-button vb-popup-open" aria-haspopup="dialog" aria-controls="' . esc_attr( $popup_id ) . '">' . esc_html( $settings['button_label'] ?? 'Open Offer' ) . '</button>'; }
+				$html .= '<div class="vb-popup-overlay" id="' . esc_attr( $popup_id ) . '" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="' . esc_attr( $title_id ) . '"><div class="vb-popup-box" style="background:' . esc_attr( $settings['bg_color'] ?? '#fff' ) . ';"><button type="button" class="vb-popup-close" aria-label="Close popup">×</button><h3 id="' . esc_attr( $title_id ) . '">' . esc_html( $settings['title'] ?? 'Special Offer' ) . '</h3><div>' . wp_kses_post( $settings['content'] ?? '' ) . '</div><a class="vb-button" href="' . esc_url( $settings['cta_url'] ?? '#' ) . '">' . esc_html( $settings['cta_text'] ?? 'Learn More' ) . '</a></div></div></div>';
 				break;
 		}
 		return self::wrap_module_visibility( $html, $settings );

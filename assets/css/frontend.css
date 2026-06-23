@@ -26,8 +26,17 @@
 	transition: opacity .15s ease;
 }
 .vb-button:hover { opacity: .85; }
+.vb-button:focus-visible,
+.vb-form button:focus-visible,
+.vb-tabs-nav button:focus-visible,
+.vb-accordion summary:focus-visible,
+.vb-popup-close:focus-visible {
+	outline: 3px solid rgba(124,58,237,.35);
+	outline-offset: 3px;
+}
 .vb-image img { max-width: 100%; display: block; }
 .vb-video-embed iframe { width: 100%; aspect-ratio: 16/9; }
+.vb-video-player { width: 100%; max-width: 100%; display: block; }
 .vb-spacer { width: 100%; }
 
 .vb-gallery { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -63,6 +72,7 @@
 .vb-form input, .vb-form textarea { width: 100%; padding: 12px 14px; border: 1px solid #d4d4d8; border-radius: 6px; box-sizing: border-box; font: inherit; }
 .vb-form textarea { min-height: 110px; resize: vertical; }
 .vb-form button { padding: 12px 18px; border: 0; border-radius: 6px; background: #7c3aed; color: #fff; font-weight: 700; cursor: pointer; }
+.vb-form button:disabled { cursor: wait; opacity: .7; }
 
 .vb-tabs { border: 1px solid #e4e4e7; border-radius: 8px; overflow: hidden; }
 .vb-tabs-nav { display: flex; flex-wrap: wrap; background: #f8fafc; }
@@ -119,6 +129,8 @@
 /* v1.3 frontend refinements */
 .vb-hp { position:absolute !important; left:-9999px !important; opacity:0 !important; height:0 !important; width:0 !important; }
 .vb-form-status { margin-top:10px; font-size:14px; }
+.vb-form-status.success { color:#166534; }
+.vb-form-status.error { color:#b91c1c; }
 .vb-anim-fade-in .vb-module { animation: vbFadeIn .65s ease both; }
 .vb-anim-slide-up .vb-module { animation: vbSlideUp .65s ease both; }
 .vb-anim-zoom-in .vb-module { animation: vbZoomIn .55s ease both; }
@@ -126,6 +138,7 @@
 @keyframes vbSlideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
 @keyframes vbZoomIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
 .vb-popup-module { text-align:center; }
+.vb-popup-active { overflow:hidden; }
 .vb-popup-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(15,23,42,.66); z-index:99999; padding:20px; }
 .vb-popup-overlay.open { display:flex; }
 .vb-popup-box { position:relative; max-width:520px; width:100%; border-radius:18px; padding:34px; box-shadow:0 25px 80px rgba(0,0,0,.28); text-align:left; }
@@ -133,4 +146,14 @@
 .vb-popup-close { position:absolute; top:12px; right:12px; width:32px; height:32px; border:0; border-radius:50%; background:#f4f4f5; cursor:pointer; font-size:22px; line-height:1; }
 @media (max-width: 767px) {
   .vb-popup-box { padding:26px 20px; border-radius:14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.vb-anim-fade-in .vb-module,
+	.vb-anim-slide-up .vb-module,
+	.vb-anim-zoom-in .vb-module,
+	.vb-slide {
+		animation: none !important;
+		transition: none !important;
+	}
 }

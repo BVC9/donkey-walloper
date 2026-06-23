@@ -138,6 +138,7 @@ final class Visual_Builder {
 		$builder_url = admin_url( 'admin.php?page=vb-builder&post=' . $post->ID );
 		?>
 		<div class="vb-metabox">
+			<?php wp_nonce_field( 'vb_save_meta_box', 'vb_meta_box_nonce' ); ?>
 			<label>
 				<input type="checkbox" name="vb_enabled" value="1" <?php checked( $enabled, '1' ); ?> />
 				Use Visual Builder for this page
@@ -202,11 +203,29 @@ add_action( 'plugins_loaded', array( 'Visual_Builder', 'instance' ) );
  * Save the "enabled" checkbox from the meta box.
  */
 add_action( 'save_post', function( $post_id ) {
-	if ( ! isset( $_POST['vb_enabled'] ) ) {
-		delete_post_meta( $post_id, '_vb_enabled' );
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-	update_post_meta( $post_id, '_vb_enabled', '1' );
+
+	if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+		return;
+	}
+
+	$nonce = isset( $_POST['vb_meta_box_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['vb_meta_box_nonce'] ) ) : '';
+	if ( ! $nonce || ! wp_verify_nonce( $nonce, 'vb_save_meta_box' ) ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['vb_enabled'] ) && '1' === wp_unslash( $_POST['vb_enabled'] ) ) {
+		update_post_meta( $post_id, '_vb_enabled', '1' );
+		return;
+	}
+
+	delete_post_meta( $post_id, '_vb_enabled' );
 } );
 
 /**
