@@ -3,7 +3,7 @@
 A Divi-style visual drag-and-drop page builder plugin for WordPress.
 
 ## Install
-1. Zip the `divi-clone-builder` folder (already done if you downloaded `visual-builder.zip`).
+1. Zip the whole plugin folder so `visual-builder.php` is at the root of the zip (not inside an extra parent folder).
 2. In WP Admin: Plugins → Add New → Upload Plugin → choose the zip → Install → Activate.
 3. Open any Page or Post → you'll see a "Visual Builder" box in the editor → click
    **Launch Visual Builder**.
