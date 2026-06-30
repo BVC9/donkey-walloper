@@ -1,0 +1,88 @@
+/*
+Theme Name: Get On Track
+Theme URI: https://getontrack.live
+Author: Get On Track
+Description: A clean coming-soon theme for Get On Track.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.8
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: getontrack
+*/
+
+body.getontrack-coming-soon {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	margin: 0;
+	min-height: 100vh;
+	box-sizing: border-box;
+	background:
+		linear-gradient(
+			101.44deg,
+			rgba(252, 204, 203, 0.2) 16.81%,
+			rgba(239, 230, 212, 0.2) 53.67%,
+			rgba(211, 220, 243, 0.2) 67.17%,
+			rgba(217, 245, 253, 0.2) 76.66%,
+			rgba(255, 255, 255, 0.2) 86.88%
+		),
+		linear-gradient(0deg, #ffffff, #ffffff);
+}
+
+.getontrack-coming-soon h1,
+.getontrack-coming-soon p {
+	max-width: 820px;
+	margin: 0;
+}
+
+.getontrack-coming-soon h1 {
+	font-family: Baskerville, Georgia, Cambria, "Times New Roman", Times, serif;
+	font-weight: normal;
+	font-size: clamp(36px, 10.5vw, 96px);
+	line-height: 1.15em;
+	text-align: center;
+	color: #000000;
+}
+
+.getontrack-coming-soon .getontrack-tagline {
+	font-family: Avenir, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+	font-weight: 500;
+	font-size: clamp(16px, 4.4vw, 36px);
+	line-height: 1.5em;
+	text-align: center;
+	color: #2b2b2b;
+	margin-top: 2em;
+}
+
+.getontrack-coming-soon .getontrack-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	bottom: 1rem;
+	left: 0;
+	right: 0;
+}
+
+.getontrack-coming-soon .getontrack-footer p {
+	margin-right: 0.5rem;
+	margin-top: 0;
+	font-size: 1rem;
+	color: #2b2b2b;
+}
+
+.getontrack-coming-soon .getontrack-footer a {
+	font-size: 1rem;
+	text-decoration: none;
+	color: #444444;
+	font-family: Avenir, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+.getontrack-coming-soon .getontrack-footer a:hover {
+	text-decoration: underline;
+}
