@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
+	"settings": {
+		"color": {
+			"palette": [
+				{ "slug": "navy", "color": "#0a1628", "name": "Navy" },
+				{ "slug": "teal", "color": "#1a6b6b", "name": "Teal" },
+				{ "slug": "teal-light", "color": "#2a9d8f", "name": "Teal Light" },
+				{ "slug": "gold", "color": "#c9a84c", "name": "Gold" },
+				{ "slug": "cream", "color": "#f7f5f0", "name": "Cream" },
+				{ "slug": "white", "color": "#ffffff", "name": "White" }
+			]
+		},
+		"typography": {
+			"fontFamilies": [
+				{
+					"fontFamily": "'Cormorant Garamond', Georgia, serif",
+					"slug": "serif",
+					"name": "Cormorant Garamond"
+				},
+				{
+					"fontFamily": "'Outfit', sans-serif",
+					"slug": "sans",
+					"name": "Outfit"
+				}
+			]
+		},
+		"layout": {
+			"contentSize": "720px",
+			"wideSize": "1200px"
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "#f7f5f0",
+			"text": "#1a1a1a"
+		},
+		"typography": {
+			"fontFamily": "var(--wp--preset--font-family--sans)",
+			"fontSize": "1rem",
+			"lineHeight": "1.65"
+		},
+		"elements": {
+			"heading": {
+				"typography": {
+					"fontFamily": "var(--wp--preset--font-family--serif)"
+				},
+				"color": {
+					"text": "#0a1628"
+				}
+			},
+			"link": {
+				"color": {
+					"text": "#1a6b6b"
+				}
+			}
+		}
+	}
+}
